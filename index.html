@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="LAMP (Lane-Aligned Motion Primitives) is a topology-aware motion forecasting framework that produces diverse and lane-compliant multimodal trajectory predictions via VQ-VAE-learned motion primitives and feasibility-aware intention selection.">
+  <meta name="keywords" content="motion forecasting, lane topology, VQ-VAE, motion primitives, autonomous driving, Argoverse 2, trajectory prediction">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAMP: Lane-Aligned Motion Primitives for Feasible Trajectory Prediction</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" type="image/png" href="./static/images/lamp.png">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="https://sangjin-homepage.github.io/" target="_blank" rel="noopener noreferrer">
+        <span class="icon"><i class="fas fa-home"></i></span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title"><strong>LAMP</strong>: <strong>L</strong>ane-<strong>A</strong>ligned <strong>M</strong>otion <strong>P</strong>rimitives for Feasible Trajectory Prediction</h1>
+          <h2 class="title is-4 publication-title" style="margin-top: 0.75rem; font-weight: 400; color:#334155;">실현 가능한 궤적 예측을 위한 차선 정렬 모션 프리미티브</h2>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://sangjin-homepage.github.io/" target="_blank" rel="noopener noreferrer">Sangjin Han</a><sup>1</sup></span>&emsp;
+            <span class="author-block">
+              <a href="#">Minseong Kim</a><sup>2</sup></span>&emsp;
+            <span class="author-block">
+              <a href="https://scholar.google.co.kr/citations?user=TLQUwIMAAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">H. Jin Kim</a><sup>1*</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Seoul National University</span>&emsp;
+            <span class="author-block"><sup>2</sup>Hyundai Motor Company</span>
+          </div>
+
+          <div class="is-size-6 publication-authors" style="color:#64748b; margin-top:6px;">
+            <sup>*</sup> Corresponding author
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- Paper Link. -->
+              <span class="link-block">
+                <a href="https://tum-avs.github.io/ICRA2026_Workshop/" target="_blank" rel="noopener noreferrer"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- arXiv Link. -->
+              <span class="link-block">
+                <a href="TODO_ARXIV_URL"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Teaser: TL;DR one-liner + overview video. Place teaser.mp4 under static/videos/. -->
+<section class="hero teaser">
+  <div class="container is-max-widescreen">
+    <div class="hero-body">
+      <video id="teaser"
+             src="./static/videos/lamp_re.mp4"
+             controls muted preload="metadata" playsinline
+             style="display:block; width:100%; margin:0 auto;">
+        Your browser does not support the video tag.
+      </video>
+      <h2 class="subtitle has-text-centered" style="font-size: 1.4rem; margin: 1.5rem auto 0; max-width: 1200px;">
+        <strong>TL;DR:</strong> LAMP produces multimodal trajectory predictions that are both diverse and lane-compliant, by integrating discrete motion primitives with lane-topology constraints &mdash; yielding feasible and diverse hypotheses for safe downstream planning.
+      </h2>
+    </div>
+  </div>
+</section>
+
+
+<!-- Results headline: high-level performance summary -->
+<section class="section section-alt">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3" style="font-size: 1.6rem;">LAMP generates diverse and lane-consistent multimodal predictions</h2>
+        <p class="is-size-5" style="max-width: 900px; margin: 0.5rem auto 1.5rem;">
+          On intersection scenarios, LAMP improves both diversity and feasibility over the MTR baseline &mdash; producing trajectories that adhere to lane topology while preserving multimodal coverage.
+        </p>
+        <img src="./static/images/lamp_qual_final.png"
+             alt="Qualitative comparison of LAMP vs MTR on intersection scenarios"
+             style="display:block; max-width: 900px; width: 100%; margin: 0 auto;">
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Overall Framework of LAMP</h2>
+      </div>
+    </div>
+  </div>
+  <div class="container is-max-widescreen">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full-width">
+        <video src="./static/videos/method_overview_re.mp4"
+               autoplay muted loop playsinline controls
+               preload="metadata"
+               style="width:100%; height:auto; border-radius:8px;"
+               aria-label="LAMP method overview video">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section section-alt">
+  <div class="container is-max-widescreen">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <h3 class="title is-5">Motivation</h3>
+          <p>
+            Multimodal motion forecasting must be accurate, feasible, and diverse to support safe planning. However, existing predictors rely on scene-agnostic intention priors (anchors, target points) and training objectives that prioritize the most-probable ground-truth mode. As a result, lower-probability modes often violate lane topology or traffic rules, producing off-road or unreachable trajectories that are unreliable for downstream planners.
+          </p>
+          <h3 class="title is-5">Approach</h3>
+          <p>
+            We propose <strong>LAMP</strong> (Lane-Aligned Motion Primitives), a topology-aware motion forecasting framework that improves the reliability of multimodal prediction sets by combining structured motion primitives with feasibility-aware intention selection.
+          </p>
+          <h3 class="title is-5">Method</h3>
+          <p>
+            LAMP builds on two design principles. (i) We learn a discrete codebook of <strong>shape-aware motion primitives</strong> via an NSVQ-based VQ-VAE, capturing the full spatiotemporal dynamics of driving intentions beyond endpoint-based priors. (ii) We use HD-map reachable-lane sets as a soft teacher distribution to train a <strong>lane-topology-guided intention selector</strong> that filters infeasible intention queries before they enter the Transformer decoder.
+          </p>
+          <h3 class="title is-5">Results</h3>
+          <p>
+            On the Argoverse 2 motion forecasting benchmark, LAMP matches strong baselines on displacement accuracy while substantially improving feasibility &mdash; particularly the planner-relevant traffic-rule metric <strong>FR (0.665 &rarr; 0.774 vs. MTR)</strong> &mdash; and diversity <strong>(DwF 7.811 &rarr; 12.559 vs. MTR)</strong>. This combination of diverse, lane-compliant hypotheses provides more reliable multimodal prediction sets for downstream planning.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Experiments -->
+<section class="section" id="Experiments">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3 has-text-centered">Experiments</h2>
+
+    <!-- 1) Main results on Argoverse 2 -->
+    <div class="experiments-block">
+      <h3 class="title is-4 has-text-centered">Main results on Argoverse 2</h3>
+      <p class="experiments-intro">LAMP matches strong baselines on displacement accuracy while substantially improving feasibility &mdash; particularly the planner-relevant FR metric &mdash; and diversity (DwF). Inference runs at 36.47 ms/scenario, comparable to MTR's 33.84 ms.</p>
+      <table class="table is-bordered is-narrow is-fullwidth result-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>b-minADE<sub>6</sub> &darr;</th>
+            <th>b-minFDE<sub>6</sub> &darr;</th>
+            <th>minADE<sub>6</sub> &darr;</th>
+            <th>minFDE<sub>6</sub> &darr;</th>
+            <th>DAC &uarr;</th>
+            <th>FR &uarr;</th>
+            <th>APD<sub>6</sub> &uarr;</th>
+            <th>FPD<sub>6</sub> &uarr;</th>
+            <th>DwF &uarr;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>LAMP (Ours)</td>
+            <td>1.345</td><td>2.281</td><td>0.904</td><td>1.785</td>
+            <td><strong>0.942</strong></td><td><strong>0.774</strong></td>
+            <td><strong>6.401</strong></td><td><strong>16.232</strong></td><td><strong>12.559</strong></td>
+          </tr>
+          <tr>
+            <td>MTR</td>
+            <td><strong>1.315</strong></td><td>2.127</td><td>0.842</td><td>1.667</td>
+            <td>0.925</td><td>0.665</td>
+            <td>4.109</td><td>10.963</td><td>7.811</td>
+          </tr>
+          <tr>
+            <td>Wayformer</td>
+            <td>1.420</td><td>2.281</td><td>0.804</td><td>1.664</td>
+            <td>0.905</td><td>0.691</td>
+            <td>4.157</td><td>11.151</td><td>8.173</td>
+          </tr>
+          <tr>
+            <td>Forecast-MAE</td>
+            <td>1.379</td><td><strong>2.125</strong></td><td>0.751</td><td><strong>1.492</strong></td>
+            <td>0.937</td><td>0.692</td>
+            <td>2.983</td><td>7.728</td><td>5.657</td>
+          </tr>
+          <tr>
+            <td>EMP</td>
+            <td>1.385</td><td>2.141</td><td><strong>0.749</strong></td><td>1.503</td>
+            <td>0.934</td><td>0.684</td>
+            <td>2.936</td><td>7.608</td><td>5.524</td>
+          </tr>
+          <tr>
+            <td>Autobot</td>
+            <td>1.512</td><td>2.389</td><td>0.846</td><td>1.720</td>
+            <td>0.937</td><td>0.699</td>
+            <td>3.567</td><td>9.163</td><td>6.829</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2) Ablation study -->
+    <div class="experiments-block">
+      <h3 class="title is-4 has-text-centered">Ablation study</h3>
+
+      <div class="tabs is-centered experiments-tabs pill-tabs">
+        <ul>
+          <li class="is-active" data-tab="quantization"><a>Quantization method</a></li>
+          <li data-tab="codebook"><a>Codebook size</a></li>
+          <li data-tab="selector"><a>Intention selector</a></li>
+        </ul>
+      </div>
+
+      <div class="experiments-panel is-active" data-tab="quantization">
+        <p class="experiments-intro">We compare NSVQ (LAMP's choice) against the original VQ-VAE and FSQ. NSVQ achieves the best displacement accuracy and DwF among the three, thanks to more stable optimization and better codebook utilization.</p>
+        <table class="table is-bordered is-narrow is-fullwidth result-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>b-minADE<sub>6</sub> &darr;</th>
+              <th>b-minFDE<sub>6</sub> &darr;</th>
+              <th>minADE<sub>6</sub> &darr;</th>
+              <th>minFDE<sub>6</sub> &darr;</th>
+              <th>DAC &uarr;</th>
+              <th>FR &uarr;</th>
+              <th>APD<sub>6</sub> &uarr;</th>
+              <th>FPD<sub>6</sub> &uarr;</th>
+              <th>DwF &uarr;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>LAMP (NSVQ, Ours)</td>
+              <td><strong>1.345</strong></td><td><strong>2.281</strong></td><td><strong>0.904</strong></td><td><strong>1.785</strong></td>
+              <td>0.942</td><td>0.774</td>
+              <td>6.401</td><td>16.232</td><td><strong>12.559</strong></td>
+            </tr>
+            <tr>
+              <td>VQ-VAE</td>
+              <td>1.362</td><td>2.442</td><td>0.975</td><td>2.064</td>
+              <td>0.936</td><td>0.710</td>
+              <td><strong>7.623</strong></td><td><strong>18.258</strong></td><td>10.911</td>
+            </tr>
+            <tr>
+              <td>FSQ</td>
+              <td>1.351</td><td>2.363</td><td>0.912</td><td>1.852</td>
+              <td><strong>0.974</strong></td><td><strong>0.797</strong></td>
+              <td>4.936</td><td>12.896</td><td>9.968</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="experiments-panel" data-tab="codebook">
+        <p class="experiments-intro">K = 64 hits the sweet spot. K = 32 lacks the capacity to express diverse intentions; K = 128 suffers from codebook collapse caused by imbalanced updates under fixed top-L selection.</p>
+        <table class="table is-bordered is-narrow is-fullwidth result-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>b-minADE<sub>6</sub> &darr;</th>
+              <th>b-minFDE<sub>6</sub> &darr;</th>
+              <th>minADE<sub>6</sub> &darr;</th>
+              <th>minFDE<sub>6</sub> &darr;</th>
+              <th>DAC &uarr;</th>
+              <th>FR &uarr;</th>
+              <th>APD<sub>6</sub> &uarr;</th>
+              <th>FPD<sub>6</sub> &uarr;</th>
+              <th>DwF &uarr;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>NSVQ(32)</td>
+              <td><strong>1.340</strong></td><td>2.334</td><td>0.942</td><td>1.947</td>
+              <td>0.938</td><td>0.759</td>
+              <td>6.065</td><td>15.992</td><td>12.514</td>
+            </tr>
+            <tr>
+              <td>LAMP (NSVQ-64, Ours)</td>
+              <td>1.345</td><td><strong>2.281</strong></td><td><strong>0.904</strong></td><td><strong>1.785</strong></td>
+              <td><strong>0.942</strong></td><td><strong>0.774</strong></td>
+              <td><strong>6.401</strong></td><td><strong>16.232</strong></td><td><strong>12.559</strong></td>
+            </tr>
+            <tr>
+              <td>NSVQ(128)</td>
+              <td>1.405</td><td>2.335</td><td>0.919</td><td>1.858</td>
+              <td>0.915</td><td>0.729</td>
+              <td>5.018</td><td>12.372</td><td>7.593</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="experiments-panel" data-tab="selector">
+        <p class="experiments-intro">Filtering infeasible intention queries before decoding (IS, L = 16) substantially improves feasibility and diversity over no selector (L = 64). Too few selected intentions (L = 6) limits decoder capacity, hurting accuracy and DwF despite increasing raw endpoint spread.</p>
+        <table class="table is-bordered is-narrow is-fullwidth result-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>b-minADE<sub>6</sub> &darr;</th>
+              <th>b-minFDE<sub>6</sub> &darr;</th>
+              <th>minADE<sub>6</sub> &darr;</th>
+              <th>minFDE<sub>6</sub> &darr;</th>
+              <th>DAC &uarr;</th>
+              <th>FR &uarr;</th>
+              <th>APD<sub>6</sub> &uarr;</th>
+              <th>FPD<sub>6</sub> &uarr;</th>
+              <th>DwF &uarr;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>w/o IS (L=64)</td>
+              <td><strong>1.339</strong></td><td>2.313</td><td>0.923</td><td>1.911</td>
+              <td>0.898</td><td>0.713</td>
+              <td>5.447</td><td>14.521</td><td>10.961</td>
+            </tr>
+            <tr>
+              <td>IS (L=6)</td>
+              <td>1.426</td><td>2.655</td><td>1.065</td><td>2.302</td>
+              <td>0.875</td><td>0.758</td>
+              <td><strong>8.981</strong></td><td><strong>18.404</strong></td><td>11.461</td>
+            </tr>
+            <tr>
+              <td>LAMP (IS, L=16, Ours)</td>
+              <td>1.345</td><td><strong>2.281</strong></td><td><strong>0.904</strong></td><td><strong>1.785</strong></td>
+              <td><strong>0.942</strong></td><td><strong>0.774</strong></td>
+              <td>6.401</td><td>16.232</td><td><strong>12.559</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3) Feasibility-diversity trade-off via LoRA -->
+    <div class="experiments-block">
+      <h3 class="title is-4 has-text-centered">Findings: LoRA-based map-adaptive motion primitives exhibit a feasibility&ndash;diversity trade-off</h3>
+      <p class="experiments-intro">We additionally explored injecting map priors into the NSVQ decoder via Low-Rank Adaptation (LoRA). Conditioning early on map features increases lane compliance (higher DAC and FR), but induces mode contraction &mdash; intention queries collapse toward dominant lane-following behaviors &mdash; sharply reducing diversity. Because LAMP prioritizes diverse-yet-feasible hypotheses for downstream planning, we exclude LoRA from the final model.</p>
+      <img src="./static/images/lamp_lora.png"
+           alt="LoRA-based map conditioning increases feasibility but collapses diversity"
+           style="display:block; max-width: 600px; width: 100%; margin: 1.5rem auto;">
+      <table class="table is-bordered is-narrow is-fullwidth result-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>DAC &uarr;</th>
+            <th>FR &uarr;</th>
+            <th>APD<sub>6</sub> &uarr;</th>
+            <th>FPD<sub>6</sub> &uarr;</th>
+            <th>DwF &uarr;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>LAMP</td>
+            <td>0.942</td><td>0.774</td>
+            <td><strong>6.401</strong></td><td><strong>16.232</strong></td><td><strong>12.559</strong></td>
+          </tr>
+          <tr>
+            <td>LAMP + LoRA</td>
+            <td><strong>0.983</strong></td><td><strong>0.794</strong></td>
+            <td>3.943</td><td>10.402</td><td>8.092</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{han2026lamp,
+  title     = {LAMP: Lane-Aligned Motion Primitives for Feasible Trajectory Prediction},
+  author    = {Han, Sangjin and Kim, Minseong and Kim, H. Jin},
+  booktitle = {TODO_VENUE},
+  year      = {2026}
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+        This page uses the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies project page template</a>
+        and is licensed under a <a rel="license"
+        href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script src="./static/js/experiments.js"></script>
+
+</body>
+</html>
